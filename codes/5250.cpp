@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <cmath>
-#include <cstdio>
+#include <iomanip>
 #include <iostream>
 using namespace std;
 
@@ -110,7 +110,7 @@ int main() {
         addline(l[n++], 10000, 10000, 0, 10000);
         addline(l[n++], 0, 10000, 0, 0);
         half_plane();
-        printf("%.1lf\n", area());
+        cout << fixed << setprecision(1) << area() << "\n";
     }
     return 0;
 }
