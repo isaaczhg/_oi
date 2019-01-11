@@ -1,116 +1,102 @@
 #include <algorithm>
 #include <cmath>
-#include <cstdio>
 #include <iostream>
 using namespace std;
 
-const double eps = 1e-8;
-const int Maxn = 20005;
+const int Maxn = 100005;
+const double inf = 1e20;
+
 struct point {
     double x, y;
 } p[Maxn];
 struct line {
-    point a, b;
-    double angle;
-} l[Maxn];
-int n, pn;
-int dq[Maxn], top, bot;
-
-int dblcmp(double k) {
-    if (fabs(k) < eps)
-        return 0;
-    return k > 0 ? 1 : -1;
-}
-
-double multi(point p0, point p1, point p2) {
-    return (p1.x - p0.x) * (p2.y - p0.y) - (p1.y - p0.y) * (p2.x - p0.x);
-}
-
-bool cmp(const line &l1, const line &l2) {
-    int d = dblcmp(l1.angle - l2.angle);
-    if (!d)
-        return dblcmp(multi(l1.a, l2.a, l2.b)) > 0;
-    return d < 0;
-}
-
-void addline(line &l, double x1, double y1, double x2, double y2) {
-    l.a.x = x1;
-    l.a.y = y1;
-    l.b.x = x2;
-    l.b.y = y2;
-    l.angle = atan2(y2 - y1, x2 - x1);
-}
-
-void get(line l1, line l2, point &p) {
-    double a1 = l1.b.y - l1.a.y;
-    double b1 = l1.a.x - l1.b.x;
-    double c1 = (l1.b.x - l1.a.x) * l1.a.y - (l1.b.y - l1.a.y) * l1.a.x;
-    double a2 = l2.b.y - l2.a.y;
-    double b2 = l2.a.x - l2.b.x;
-    double c2 = (l2.b.x - l2.a.x) * l2.a.y - (l2.b.y - l2.a.y) * l2.a.x;
-    p.x = (c2 * b1 - c1 * b2) / (a1 * b2 - a2 * b1);
-    p.y = (c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1);
-}
-
-bool judge(line l0, line l1, line l2) {
-    point p;
-    get(l1, l2, p);
-    return dblcmp(multi(p, l0.a, l0.b)) < 0;
-}
-
-void half_plane() {
-    int i, j;
-    sort(l, l + n, cmp);
-    for (i = 0, j = 0; i < n; i++)
-        if (dblcmp(l[i].angle - l[j].angle) > 0)
-            l[++j] = l[i];
-    n = j + 1;
-    dq[0] = 0;
-    dq[1] = 1;
-    top = 1;
-    bot = 0;
-    for (i = 2; i < n; i++) {
-        while (top > bot && judge(l[i], l[dq[top]], l[dq[top - 1]]))
-            top--;
-        while (top > bot && judge(l[i], l[dq[bot]], l[dq[bot + 1]]))
-            bot++;
-        dq[++top] = i;
+    point s, t;
+    double ang;
+    int id;
+    void init(point a, point b, int th) {
+        s = a;
+        t = b;
+        id = th;
+        ang = atan2(t.y - s.y, t.x - s.x);
     }
-    while (top > bot && judge(l[dq[bot]], l[dq[top]], l[dq[top - 1]]))
-        top--;
-    while (top > bot && judge(l[dq[top]], l[dq[bot]], l[dq[bot + 1]]))
-        bot++;
-    dq[++top] = dq[bot];
-    for (pn = 0, i = bot; i < top; i++, pn++)
-        get(l[dq[i + 1]], l[dq[i]], p[pn]);
+} l[Maxn * 2], a[Maxn * 2];
+int n, m, h, t;
+int q[Maxn * 2];
+
+double cross(point p1, point p2, point p3) {
+    return (p1.x - p3.x) * (p1.y - p3.y) - (p1.y - p3.y) * (p2.x - p3.x);
 }
 
-double area() {
-    if (pn < 3)
-        return 0;
-    double area = 0;
-    for (int i = 1; i < pn - 1; i++)
-        area += multi(p[0], p[i], p[i + 1]);
-    if (area < 0)
-        area = -area;
-    return area / 2;
+bool cmp(const line &a, const line &b) {
+    if (a.ang == b.ang)
+        return cross(b.t, a.t, a.s) < 0;
+    return a.ang < b.ang;
+}
+
+void get(int x, int y, point &p) {
+    double c1 = cross(a[x].s, a[y].t, a[y].s);
+    double c2 = cross(a[y].t, a[x].t, a[y].s);
+    p.x = (a[x].s.x * c2 + a[x].t.x * c1) / (c1 + c2);
+    p.y = (a[x].s.y * c2 + a[x].t.y * c1) / (c1 + c2);
+} 
+
+bool judge(int now, int x, int y) {
+    point p;
+    get(x, y, p);
+    return cross(a[now].t, p, a[now].s) < 0;
+}
+
+void half_plane(int x) {
+    int cnt = 0;
+    for (int i = 1; i <= m; i++)
+        if (l[i].id <= x) {
+            if (l[i].ang != a[cnt].ang)
+                cnt++;
+            a[cnt] = l[i];
+        }
+    h = 1;
+    t = 0;
+    q[++t] = 1;
+    q[++t] = 2;
+    for (int i = 3; i <= cnt; i++) {
+        while (h < t && judge(i, q[t], q[t - 1]))
+            t--;
+        while (h < t && judge(i, q[h], q[h + 1]))
+            h++;
+        q[++t] = i;
+    }
+    while (h < t && judge(q[h], q[t], q[t - 1]))
+        t--;
+    while (h < t && judge(q[t], q[h], q[h + 1]))
+        h++;
 }
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    double x1, y1, x2, y2;
-    while (cin >> n) {
-        for (int i = 0; i < n; i++) {
-            cin >> x1 >> y1 >> x2 >> y2;
-            addline(l[i], x1, y1, x2, y2);
-        }
-        addline(l[n++], 0, 0, 10000, 0);
-        addline(l[n++], 10000, 0, 10000, 10000);
-        addline(l[n++], 10000, 10000, 0, 10000);
-        addline(l[n++], 0, 10000, 0, 0);
-        half_plane();
-        printf("%.1lf\n", area());
+    int st, ed, mid, ans;
+    double x, y1, y2;
+    m = 0;
+    l[++m].init((point){-inf, -inf}, (point){inf, -inf}, 0);
+    l[++m].init((point){inf, -inf}, (point){inf, inf}, 0);
+    l[++m].init((point){inf, inf}, (point){-inf, inf}, 0);
+    l[++m].init((point){-inf, inf}, (point){-inf, -inf}, 0);
+    cin >> n;
+    for (int i = 1; i <= n; i++) {
+        cin >> x >> y1 >> y2;
+        l[++m].init((point){-1, y1 / x + x}, (point){1, y1 / x - x}, i);
+        l[++m].init((point){1, y2 / x - x}, (point){-1, y2 / x + x}, i);
     }
+    sort(l + 1, l + 1 + m, cmp);
+    st = 1, ed = n;
+    while (st <= ed) {
+        mid = (st + ed) >> 1;
+        half_plane(mid);
+        if (t - h >= 2)
+            st = mid + 1, ans = mid;
+        else
+            ed = mid - 1;
+    }
+    cout << ans << "\n";
     return 0;
 }
