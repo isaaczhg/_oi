@@ -1,9 +1,8 @@
 #include <iostream>
 #include <cstdio>
-#include <algorithm>
 using namespace std;
 
-long long p[1005], ans;
+long long p[1005];
 
 bool insert(long long x) {
     for (int i = 62; i >= 0; i--)
@@ -33,14 +32,6 @@ int main() {
         scanf("%lld", &x);
         insert(x);
     }
-    ans = getmax();
-    printf("%lld ", ans);
-    sort(p, p + 62);
-    for (int i = 0; i <= 62; i++)
-        if (p[i]) {
-            ans ^= p[i];
-            break;
-        }
-    printf("%lld", ans);
+    printf("%lld", getmax());
     return 0;
-}    
+}
