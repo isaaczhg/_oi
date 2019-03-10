@@ -14,8 +14,8 @@ string name[15];
 string p;
 
 int main() {
-    ifstream fin ("friday.in");
-    ofstream fout ("friday.out");
+    ifstream fin ("gift1.in");
+    ofstream fout ("gift1.out");
     fin >> np;
     for (int i = 1; i <= np; i++)
         fin >> name[i];
