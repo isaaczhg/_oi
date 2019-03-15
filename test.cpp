@@ -1,33 +1,27 @@
+#include <cstdio>
 #include <iostream>
-#include <cstring>
 using namespace std;
 
-int n;
-bool a[15][15], b[15][15], tmp[15][15];
-
-void change1() {
-    memcpy(tmp, b, sizeof(b));
-    
-}
-
 int main() {
-    char ch;
-    cin >> n;
-    for (int i = 1; i <= n; i++)
-        for (int j = 1; j <= n; j++) {
-            cin >> ch;
-            if (ch == '@')
-                a[i][j] = 1;
-            else 
-                a[i][j] = 0;
-        }
-    for (int i = 1; i <= n; i++)
-        for (int j = 1; j <= n; j++) {
-            cin >> ch;
-            if (ch == '@')
-                b[i][j] = 1;
-            else 
-                b[i][j] = 0;
-        }
-    
+    int n, temp, ans, sum;
+    scanf("%d", &n);
+    ans = sum = 0;
+    while (n--) {
+        scanf("%d", &temp);
+        ans ^= temp;
+        if (temp > 1)
+            sum++;
+    }
+    if (ans == 0) {
+        if (sum)
+            printf("win\n");
+        else
+            printf("lose\n");
+    } else {
+        if (sum)
+            printf("win\n");
+        else
+            printf("lose\n");
+    }
+    return 0;
 }
