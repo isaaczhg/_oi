@@ -1,54 +1,44 @@
-#include <cstdio>
 #include <iostream>
+#include <cstdio>
+#include <cmath>
+#include <algorithm>
 using namespace std;
 
-long long prime[1000005];
-long long a, b, n, num;
-
-void calc(long long x) {
-    num = 0;
-    for (long long i = 2; i * i <= x; i++) {
-        if (x % i == 0) {
-            prime[num++] = i;
-            while (x % i == 0)
-                x = x / i;
-        }
-    }
-    if (x > 1)
-        prime[num++] = x;
+struct bianji {
+    int u, v, d;
+} a[600005];
+struct edge {
+    int u, v, next;
+}
+int father[300005];
+int n, m;
+bool cmp(const bianji &x, const bianji &y) {
+    return x.d < y.d;
 }
 
-long long solve(long long x) {
-    long long t, ans = 0;
-    long long cnt;
-    for (long long i = 1; i < (long long)(1 << num); i++)
-    {
-        t = 1;
-        cnt = 0;
-        for (long long j = 0; j < num; j++)
-        {
-            if ((long long)(1 << j) & i) {
-                cnt++;
-                t *= prime[j];
-            }
-        }
-
-        if (cnt & 1)
-            ans += x / t;
-        else
-            ans -= x / t;
-    }
-
-    return ans;
+int getfather(int x) {
+    if (father[x] == x)
+        return x;
+    else return father[x] = getfather(father[x]);
 }
+
+void addedge(int x, int y, int d)
 
 int main() {
-    long long t;
-    scanf("%lld", &t);
-    while (t--) {
-        scanf("%lld%lld%lld", &a, &b, &n);
-        calc(n);
-        printf("%lld\n", b - (a - 1) - (solve(b) - solve(a - 1)));
+    scanf("%d%d", &n, &m);
+    for (int i = 1; i <= m; i++) 
+        scanf("%d%d%d", &a[i].u, &a[i].v, &a[i].d);
+    sort(a + 1, a + m + 1, cmp);
+    for (int i = 1; i <= n; i++)
+        father[i] = i;
+    long long cnt = 0ll;
+    for(int i = 1; i <= m; i++) {
+        int f1 = getfather(a[i].u);
+        int f2 = getfather(a[i].v);
+        if (f1 != f2) {
+            cnt += a[i].d;
+            father[f1] = f2;
+            addedge(a[i].u, a[i].v, a[i].d);
+        }
     }
-    return 0;
 }
