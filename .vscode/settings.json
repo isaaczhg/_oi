@@ -40,7 +40,8 @@
         "cmath": "cpp",
         "fstream": "cpp",
         "ostream": "cpp",
-        "cstdio": "cpp"
+        "cstdio": "cpp",
+        "algorithm": "cpp"
     }, // 效果效果比cpptools要好
     "files.autoSave": "onWindowChange",
 }
