@@ -1,41 +1,33 @@
-#include<bits/stdc++.h>
+#include <iostream>
+#include <cstdio>
 using namespace std;
-int n,m,t[100005],v[100005],a[100005],f[100005]={0},sum[15][15]={0},num=0;
-void complete(int T,int V)
-{
-	for(int i=T;i<=m;i++)
-	f[i]=max(f[i],f[i-T]+V);
-}
-void zeroonepack(int T,int V)
-{
-	for(int i=m;i>=T;i--)
-	f[i]=max(f[i],f[i-T]+V);
-}
-int main()
-{
-	int x,y;
-	cin>>n>>m;
-	for(int i=1;i<=n;i++){cin>>x>>y;sum[x][y]++;}
-	for(int i=1;i<=10;i++)
-	 for(int j=1;j<=10;j++)
-	 	if(sum[i][j])
-	 	{
-	 	num++;
-	 	a[num]=sum[i][j];//计算出现次数
-		t[num]=i;
-		v[num]=j; 
-		 }
-	for(int i=1;i<=num;i++)
-	{
-		if(a[i]*t[i]>m){complete(t[i],v[i]);continue;}//如果出现次数*时间大于总时间，无论如何拿不完，因此视为完全背包 
-		int k=1;
-		while(k<=a[i]) 
-		{
-			zeroonepack(k*t[i],k*v[i]);//二进制就是往里塞 
-			a[i]=a[i]-k;
-			k*=2;
-		}
-		if(a[i])zeroonepack(t[i]*a[i],v[i]*a[i]);
+
+const int inf = 0x7fffffff / 2;
+const int mov = 1000000;
+int n, sum;
+int h[100005], s[100005];
+int f[2][2000005];
+
+int main() {
+	scanf("%d", &n);
+	for (int i = 1; i <= n; i++) {
+		scanf("%d", &h[i]);
+		s[i] = s[i - 1] + h[i];
+		sum += h[i];
 	}
-	cout<<f[m]<<endl;
+	for (int i = 0; i < 2; i++)
+		for (int j = -sum; j <= sum; j++)
+			f[i][j + mov] = -inf;
+	f[0][mov] = 0;
+	for (int i = 1; i <= n; i++) {
+		for (int j = -s[i]; j <= s[i]; j++)
+			f[i % 2][j + mov] = inf;
+		for (int j = -s[i]; j <= s[i]; j++)
+			f[i % 2][j + mov] = max(f[(i - 1) % 2][j + mov], max(f[(i - 1) % 2][j - h[i]], f[(i - 1) % 2][j + h[i]]));
+	}
+	if (f[n % 2][mov] > 0)
+		printf("%d\n",f[n % 2][mov]);
+	else 
+		printf("0\n");
+	return 0;
 }
