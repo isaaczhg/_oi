@@ -1,40 +1,28 @@
 #include <iostream>
 #include <cstdio>
-#include <cmath>
+#include <algorithm>
 using namespace std;
 
-char map[750][750];
+struct point {
+	int x, y;
+} a[10005];
+int n, mid, ans;
 
-void dfs(int n, int x, int y) {
-	int siz;
-	if (n == 1) {
-		map[x][y] = 'X';
-		return;
-	}
-	siz = pow(3.0, n - 2);
-	dfs (n - 1, x, y);//左上
-	dfs(n - 1, x, y + siz * 2);//右上
-	dfs(n - 1, x + siz, y + siz);//中间
-	dfs(n - 1, x + siz * 2, y);//左下
-	dfs(n - 1, x + siz * 2, y + siz * 2);//右下
+bool cmp(const point &x, const point &y) {
+	return (x.y < y.y) || (x.y == y.y && x.x < y.x);
 }
 
 int main() {
-	int n, siz;
-	while(cin >> n) {
-		if (n == -1)
-			return 0;
-		siz = pow(3.0, n - 1);
-		for (int i = 1; i <= siz; i++)
-			for (int j = 1; j <= siz; j++)
-				map[i][j] = ' ';
-		dfs(n, 1, 1);
-		for (int i = 1; i <= siz; i++) {
-			for (int j = 1; j <= siz; j++)
-				cout << map[i][j];
-			cout << "\n";
-		}
-		cout << "-\n";
-	}
+	scanf("%d", &n);
+	for (int i = 1; i <= n; i++)
+		scanf("%d%d", &a[i].x, &a[i].y);
+	sort(a + 1, a + n + 1, cmp);
+	for (int i = 1; i <= n; i++)
+		a[i].x -= (i - 1);
+	sort(a + 1, a + n + 1, cmp);
+	mid = (1 + n) / 2;
+	for (int i = 1; i <= n; i++)
+		ans += abs(a[i].x - a[mid].x);
+	printf("%d\n", ans);
 	return 0;
 }
