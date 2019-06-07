@@ -2,16 +2,18 @@
 #include <cstring>
 #include <iostream>
 using namespace std;
+
+int n, len, num = 0;
 int nxt[1000005];
+string s;
+
 int main() {
-    int n, len, num = 0;
-    string s;
-    cin >> n;
+    scanf("%d", &n);
     while (n) {
         cin >> s;
         len = s.length();
         s = ' ' + s;
-        cout << "Test case #" << ++num << endl;
+        printf("Test case #%d\n", ++num);
         memset(nxt, 0, sizeof(nxt));
         for (int i = 2, j = 0; i <= len; i++) {
             while (j > 0 && s[i] != s[j + 1])
@@ -24,7 +26,8 @@ int main() {
             if (i % (i - nxt[i]) == 0 && nxt[i])
                 printf("%d %d\n", i, i / (i - nxt[i]));
         }
-        cout << endl;
-        cin >> n;
+        printf("\n");
+        scanf("%d", &n);
     }
+    return 0;
 }
