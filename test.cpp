@@ -1,39 +1,45 @@
-#include <algorithm>
 #include <iostream>
+#include <cstdio>
+#include <cstring>
 using namespace std;
-struct tyc {
-    int id, c;
-} a[200005];
-int n, bj, ans, m, l[200005], r[200005];
 
-bool cmp(tyc a, tyc b) { return (a.c == b.c) ? a.id < b.id : a.c < b.c; }
+int n, m, tot = 1;
+int trie[1000005][26], cnt[1000005];
+char s[1000005];
+bool End[1000005];
+
+void insert(char *str) {
+    int len = strlen(str), p = 1;
+    for (int k = 0; k < len; k++) {
+        int ch = str[k] - 'a';
+        if (!trie[p][ch])
+            trie[p][ch] = ++tot;
+        cnt[trie[p][ch]]++;
+        p = trie[p][ch];
+    }
+    End[p] = true;
+}
+
+int search(char *str) {
+    int len = strlen(str), p = 1, ans = 0;
+    for (int k = 0; k < len; k++) {
+        p = trie[p][str[k] - 'a'];
+        ans += cnt[p];
+        if (p == 0)
+            return 0;
+    }
+    return ans;
+}
 
 int main() {
-    scanf("%d", &n);
+    scanf("%d%d", &n, &m);
     for (int i = 1; i <= n; i++) {
-        scanf("%d", &a[i].c);
-        a[i].id = i;
+        scanf("%s", s);
+        insert(s);
     }
-    sort(1 + a, 1 + a + n, cmp);
-    a[0].c = -0x7fffffff / 2;
-    for (int i = 1; i <= n; i++) {
-        if (a[i].c != a[i - 1].c) {
-            m++;
-            l[m] = a[i].id;
-            r[m] = a[i].id;
-        }
-        l[m] = min(l[m], a[i].id);
-        r[m] = max(r[m], a[i].id);
-    }
-    bj = 1;
     for (int i = 1; i <= m; i++) {
-        if (bj == 1 && r[i] >= l[i - 1])
-            bj = 0;
-        else if (bj == 0 && l[i] <= r[i - 1]) {
-            bj = 1;
-            ans++;
-        }
+        scanf("%s", s);
+        printf("%d\n", search(s));
     }
-    printf("%d\n", ans);
     return 0;
 }
